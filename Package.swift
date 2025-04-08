@@ -11,10 +11,11 @@ var sources = [
     "ggml-alloc.c",
     "ggml-backend.c",
     "ggml-quants.c",
+    "ggml-metal.m",
 ]
 
-var resources: [Resource] = []
-var linkerSettings: [LinkerSetting] = []
+var resources: [Resource] = [.process("ggml-metal.metal")]
+var linkerSettings: [LinkerSetting] = [.linkedFramework("Accelerate")]
 var cSettings: [CSetting] =  [
     .unsafeFlags(["-Wno-shorten-64-to-32", "-O3", "-DNDEBUG"]),
     .unsafeFlags(["-fno-objc-arc"]),
@@ -23,11 +24,13 @@ var cSettings: [CSetting] =  [
     // (ref: ref: https://developer.apple.com/documentation/accelerate/1513264-cblas_sgemm?language=objc)
     // .define("ACCELERATE_NEW_LAPACK"),
     // .define("ACCELERATE_LAPACK_ILP64")
+    .define("GGML_USE_ACCELERATE"),
+        .define("GGML_USE_METAL")
 ]
 
 #if canImport(Darwin)
 sources.append("ggml-metal.m")
-resources.append(.process("ggml-metal.metal"))
+//resources.append(.process("ggml-metal.metal"))
 linkerSettings.append(.linkedFramework("Accelerate"))
 cSettings.append(
     contentsOf: [
