@@ -357,11 +357,17 @@ if has_llava_projector:
     projector = torch.load(args.llava_projector)
     for name, data in projector.items():
         name = get_tensor_name(name)
-        # pw and dw conv ndim==4
+        # pw and dw conv ndim==4 
+        # Below is original by commented out
+        # if data.ndim == 2 or data.ndim == 4:
+        #     data = data.squeeze().numpy().astype(np.float16)
+        # else:
+        #     data = data.squeeze().numpy().astype(np.float32)
+        # added by Masaki
         if data.ndim == 2 or data.ndim == 4:
-            data = data.squeeze().numpy().astype(np.float16)
+          data = data.squeeze().float().numpy()
         else:
-            data = data.squeeze().numpy().astype(np.float32)
+           data = data.squeeze().float().numpy()
 
         fout.add_tensor(name, data)
 
